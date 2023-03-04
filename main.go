@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/ogp", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		url := r.URL.Query().Get("url")
 		if url == "" {
 			http.Error(w, "url parameter is required", http.StatusBadRequest)
