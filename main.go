@@ -9,7 +9,19 @@ import (
 )
 
 func main() {
+	// 許可するオリジンのリスト
+	allowedOrigins := []string{"http://example.com", "https://example.com"}
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		// CORSの設定
+		origin := r.Header.Get("Origin")
+		if origin == "" || !contains(allowedOrigins, origin) {
+			http.Error(w, "forbidden", http.StatusForbidden)
+			return
+		}
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+
+		// リクエストのパラメータからURLを取得
 		url := r.URL.Query().Get("url")
 		if url == "" {
 			http.Error(w, "url parameter is required", http.StatusBadRequest)
@@ -52,4 +64,13 @@ func main() {
 	})
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func contains(slice []string, str string) bool {
+	for _, s := range slice {
+		if s == str {
+			return true
+		}
+	}
+	return false
 }
