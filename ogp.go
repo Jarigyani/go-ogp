@@ -16,14 +16,15 @@ func init() {
 
 func GetOGP(w http.ResponseWriter, r *http.Request) {
 	// 許可するオリジンのリスト
-	key := "5aa2dc47-2345-492c-bf74-aaec2144ff9b"
 	allowedOrigins := strings.Split(os.Getenv("ALLOWED_ORIGINS"), ",")
+
+	id := os.Getenv("APP_ID")
 
 	// CORSの設定
 	origin := r.Header.Get("Origin")
 	w.Header().Set("Access-Control-Allow-Headers", "Authorization")
 
-	if r.URL.Query().Get("appid") == key {
+	if r.URL.Query().Get("appid") == id {
 		w.Header().Set("Access-Control-Allow-Origin", origin)
 	} else {
 		if origin == "" || !contains(allowedOrigins, origin) {
