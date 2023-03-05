@@ -1,10 +1,11 @@
-module github.com/Jarigyani/go-ogp
+module github.com/Jarigyani/go_ogp
 
 go 1.20
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/PuerkitoBio/goquery v1.8.1
+	github.com/joho/godotenv v1.5.1
 )
 
 require (

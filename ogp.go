@@ -1,4 +1,4 @@
-package main
+package go_ogp
 
 import (
 	"encoding/json"
@@ -11,20 +11,27 @@ import (
 )
 
 func init() {
-	functions.HTTP("GetOGP", getOGP)
+	functions.HTTP("GetOGP", GetOGP)
 }
 
-func getOGP(w http.ResponseWriter, r *http.Request) {
+func GetOGP(w http.ResponseWriter, r *http.Request) {
 	// 許可するオリジンのリスト
-	allowedOrigins := strings.Split(os.Getenv("ALLOWED_ORIGINS"), " ")
+	key := "5aa2dc47-2345-492c-bf74-aaec2144ff9b"
+	allowedOrigins := strings.Split(os.Getenv("ALLOWED_ORIGINS"), ",")
 
 	// CORSの設定
 	origin := r.Header.Get("Origin")
-	if origin == "" || !contains(allowedOrigins, origin) {
-		http.Error(w, "forbidden", http.StatusForbidden)
-		return
+	w.Header().Set("Access-Control-Allow-Headers", "Authorization")
+
+	if r.URL.Query().Get("appid") == key {
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+	} else {
+		if origin == "" || !contains(allowedOrigins, origin) {
+			http.Error(w, "forbidden", http.StatusForbidden)
+			return
+		}
+		w.Header().Set("Access-Control-Allow-Origin", origin)
 	}
-	w.Header().Set("Access-Control-Allow-Origin", origin)
 
 	url := r.URL.Query().Get("url")
 	if url == "" {
@@ -32,15 +39,7 @@ func getOGP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 指定されたURLのOGP情報を取得する
-	resp, err := http.Get(url)
-	if err != nil {
-		http.Error(w, "failed to get url", http.StatusInternalServerError)
-		return
-	}
-	defer resp.Body.Close()
-
-	doc, err := goquery.NewDocumentFromReader(resp.Body)
+	doc, err := goquery.NewDocument(url)
 	if err != nil {
 		http.Error(w, "failed to parse html", http.StatusInternalServerError)
 		return
